@@ -3,6 +3,7 @@ import { StyleSheet, View, SafeAreaView, Text} from 'react-native';
 import Logo from './src/components/logo';
 import Input from './src/components/input';
 import CustomPicker from './src/components/customPicker';
+import CustomSlider from './src/components/customSlider';
 
 class App extends Component {
   
@@ -33,13 +34,17 @@ class App extends Component {
         {id: 1, descricao: "Manhã"},
         {id: 2, descricao: "Noite"},
         {id: 3, descricao: "Integral"}
-      ]
+      ],
+      idade: null,
+      renda: 0
     };
 
     this.alterarNome = this.alterarNome.bind(this)
     this.selecionaCurso = this.selecionaCurso.bind(this)
     this.selecionaPeriodo = this.selecionaPeriodo.bind(this)
     this.selecionaTurno = this.selecionaTurno.bind(this)
+    this.alteraIdade = this.alteraIdade.bind(this)
+    this.alteraRenda = this.alteraRenda.bind(this)
   }
 
   alterarNome(novoNome) {
@@ -58,6 +63,14 @@ class App extends Component {
     this.setState({turno: novoTurno})
   }
   
+  alteraIdade(novaIdade) {
+    this.setState({idade: novaIdade})
+  }
+
+  alteraRenda(novaRenda) {
+    this.setState({renda: novaRenda})
+  }
+
   render(){
     return (
       <SafeAreaView style={styles.container}>
@@ -69,6 +82,7 @@ class App extends Component {
           <Input
             placeholder="Digite seu nome"
             action={this.alterarNome}
+            tipoTeclado={"default"}
           />
           <CustomPicker 
             valorSelecionado={this.state.curso}
@@ -85,6 +99,18 @@ class App extends Component {
             listaItens={this.state.turnos}
             action={this.selecionaTurno}
           /> 
+          <Input
+            placeholder="Digite seu idade"
+            action={this.alteraIdade}
+            tipoTeclado={"numeric"}
+          />
+          <CustomSlider 
+            titulo="Renda"
+            valorMin={0}
+            valorMax={10000}
+            action={this.alteraRenda}
+          />
+
           <Text style={styles.infoTitle}>Informações inseridas:</Text> 
           <Text style={styles.infoLabel}>
             Nome: <Text style={styles.infoValue}>{this.state.nome}</Text>
@@ -116,7 +142,6 @@ const styles = StyleSheet.create({
     height: 80,
     justifyContent: 'center',
     padding: 20,
-    paddingTop: 40
   },
   body:{
     padding: 20

@@ -10,6 +10,7 @@ class Input extends Component {
                     style={styles.input}
                     placeholder={this.props.placeholder}
                     onChangeText={this.props.action}
+                    keyboardType={this.props.tipoTeclado}
                 />
              </View>
         );
