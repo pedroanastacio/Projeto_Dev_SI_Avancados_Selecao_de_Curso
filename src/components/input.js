@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, TextInput } from 'react-native';
+import { StyleSheet, View, TextInput, Text } from 'react-native';
 
 class Input extends Component {
     
     render() {
         return(
-            <View>
+            <View style={styles.container}>
+                <Text> {this.props.label} </Text>
                 <TextInput 
                     style={styles.input}
                     placeholder={this.props.placeholder}
                     onChangeText={this.props.action}
+                    value={this.props.value}
                     keyboardType={this.props.tipoTeclado}
                 />
              </View>
@@ -18,12 +20,16 @@ class Input extends Component {
 }
 
 const styles = StyleSheet.create({
+    container: {
+        minWidth: 200,
+        marginTop: 10
+    },
     input: {
         padding: 7,
         borderWidth: 1,
-        width: 300,
-        borderRadius: 3,
-        marginTop: 10
+        borderRadius: 8,
+        marginTop: 5,
+        borderColor: '#154c79'
     }
 })
 

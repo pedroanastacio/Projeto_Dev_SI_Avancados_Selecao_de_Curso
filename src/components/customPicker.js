@@ -1,5 +1,5 @@
 import React, {Component } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 
 class CustomPicker extends Component {
@@ -11,12 +11,19 @@ class CustomPicker extends Component {
 
         return (
             <View style={styles.container}>
-                <Picker
-                    selectedValue={this.props.valorSelecionado}
-                    onValueChange={(itemValue) => this.props.action(itemValue)}
-                >
-                    {lista}
-                </Picker>
+                <Text> {this.props.label} </Text>
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={this.props.valorSelecionado}
+                        onValueChange={(itemValue) => {
+                            this.props.formikAction(this.props.field, itemValue)
+                            this.props.action(itemValue)   
+                        }}
+                    >
+                        <Picker.Item value='' label={`Selecione o ${ this.props.field}`} />
+                        {lista}
+                    </Picker>
+                </View>
             </View>
         );
     }
@@ -24,15 +31,17 @@ class CustomPicker extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        borderRadius: 3,
-        width: 300,
-        borderWidth: 1,
-        borderColor: '#000',
-        marginTop: 10,
-        padding: 0,
+        minWidth: 200,
+        marginTop: 10
+    }, 
+    pickerContainer: {
         height: 45,
-        justifyContent: 'center'
-    },    
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#154c79',
+        justifyContent: 'center',
+        marginTop: 5
+    }   
     
 });
 
