@@ -6,7 +6,7 @@ class InfoField extends Component {
         return(
             <View style={styles.container}>
                 <Text style={styles.infoLabel}>
-                    {`${this.props.label}:`}
+                    { this.props.label }
                     <Text style={styles.infoValue}> {this.props.info} </Text>
                 </Text>
              </View>

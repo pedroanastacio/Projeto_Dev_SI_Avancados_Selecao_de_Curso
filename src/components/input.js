@@ -10,7 +10,7 @@ class Input extends Component {
                 <TextInput 
                     style={styles.input}
                     placeholder={this.props.placeholder}
-                    onChangeText={this.props.action}
+                    onChangeText={(text) => {this.props.action(text); this.props.formikAction(text)}}
                     value={this.props.value}
                     keyboardType={this.props.tipoTeclado}
                 />

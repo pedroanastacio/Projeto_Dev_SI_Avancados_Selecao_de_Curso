@@ -8,34 +8,44 @@ import CustomPicker from './src/components/customPicker';
 import CustomSlider from './src/components/customSlider';
 import BtnSubmit from './src/components/btnSubmitForm';
 import InfoField from './src/components/infoField';
+import ErrorValidationMessage from './src/components/errorValidationMsg.js'
+import LoadingModal from './src/components/loadingModal';
+
 
 const validationSchema = Yup.object().shape({
   nome: Yup.string()
-      .matches(/^[A-Za-z ]*$/, 'Insira um nome válido')
-      .max(50, 'O limite de caracteres é 50')
-      .required('O nome é obrigatório'),
+    .matches(/^[A-Za-z ]*$/, 'Apenas letras são aceitas')
+    .max(50, 'O limite de caracteres é 50')
+    .required('O nome é obrigatório'),
   idade: Yup.number()
-      .typeError('Somente números são aceitos')
-      .positive('Somente números positivos são aceitos')
-      .integer('Somente números inteiros são aceitos')
-      .required('A idade é obrigatória'),
+    .typeError('Somente números são aceitos')
+    .positive('Somente números positivos são aceitos')
+    .integer('Somente números inteiros são aceitos')
+    .required('A idade é obrigatória'),
+  sexo: Yup.string()
+    .required('O sexo é obrigatório'),    
   curso: Yup.string()
-      .required('O curso é obrigatório'),
+    .required('O curso é obrigatório'),
   periodo: Yup.string()
-        .required('O período é obrigatório'),
+    .required('O período é obrigatório'),
   turno: Yup.string()
     .required('O turno é obrigatório'),
+  renda: Yup.number()  
+    .required('A renda é obrigatória'),
+  foiBolsista: Yup.boolean()
+    .required('É obrigatório informar se você já foi bolsista')  
 
 })
 
 const formikInitialValues = {
   nome: '',
   idade: '',
+  sexo: '',
   curso: '',
   periodo: '',
   turno: '',
-  renda: '',
-  foiBolsista: ''
+  renda: 0,
+  foiBolsista: false
 }
 
 class App extends Component {
@@ -47,6 +57,7 @@ class App extends Component {
       curso: '',
       periodo: '',
       turno: '',
+      sexo: '',
       cursos: [
         {id: 1, descricao: "Sistemas de Informação"},
         {id: 2, descricao: "Administração"},
@@ -68,14 +79,19 @@ class App extends Component {
         {id: 2, descricao: "Noite"},
         {id: 3, descricao: "Integral"}
       ],
-      idade: null,
+      sexos: [
+        {id: 1, descricao: "Masculino"},
+        {id:2, descricao: "Feminino"}
+      ],
+      idade: '',
       renda: 0,
       foiBolsista: false,
       successSubmit: false,
-      teste: ''
+      isLoading: false
     };
 
-    this.alterarNome = this.alterarNome.bind(this)
+    this.alteraNome = this.alteraNome.bind(this)
+    this.selecionaSexo = this.selecionaSexo.bind(this)
     this.selecionaCurso = this.selecionaCurso.bind(this)
     this.selecionaPeriodo = this.selecionaPeriodo.bind(this)
     this.selecionaTurno = this.selecionaTurno.bind(this)
@@ -84,8 +100,12 @@ class App extends Component {
     this.customHandleSubmit = this.customHandleSubmit.bind(this)
   }
 
-  alterarNome(novoNome) {
+  alteraNome(novoNome) {
     this.setState({nome: novoNome })
+  }
+
+  selecionaSexo(novoSexo) {
+    this.setState({sexo: novoSexo})
   }
 
   selecionaCurso(novoCurso) {
@@ -108,15 +128,15 @@ class App extends Component {
     this.setState({renda: novaRenda})
   }
 
-  customHandleSubmit(data) {
-    this.alterarNome(data.nome)
-    this.alteraIdade(data.idade)
-    this.setState({successSubmit: true})
+  customHandleSubmit() {
+    this.setState({isLoading: true})
+    setTimeout(() => {this.setState({isLoading: false, successSubmit: true})}, 3000)
   }
 
   render(){
     return (
       <SafeAreaView style={styles.container}>
+        <LoadingModal modalVisible={this.state.isLoading} />
         <ScrollView>
           <View style={styles.header}>
             <Logo />
@@ -127,27 +147,31 @@ class App extends Component {
               <React.Fragment>
                 <Text style={styles.infoTitle}>Informações inseridas:</Text> 
                 <InfoField 
-                  label="Nome"
+                  label="Nome:"
                   info={this.state.nome}
                 />
                 <InfoField 
-                  label="Idade"
+                  label="Idade:"
                   info={this.state.idade}
                 />
                 <InfoField 
-                  label="Curso"
+                  label="Sexo:"
+                  info={this.state.sexos[this.state.sexo].descricao}
+                />
+                <InfoField 
+                  label="Curso:"
                   info={this.state.cursos[this.state.curso].descricao}
                 />
                 <InfoField 
-                  label="Período"
+                  label="Período:"
                   info={this.state.periodos[this.state.periodo].descricao}
                 />
                 <InfoField 
-                  label="Turno"
+                  label="Turno:"
                   info={this.state.turnos[this.state.turno].descricao}
                 />
                 <InfoField 
-                  label="Renda"
+                  label="Renda:"
                   info={`R$ ${this.state.renda.toFixed(2)}`}
                 />
                 <InfoField 
@@ -168,22 +192,35 @@ class App extends Component {
                     <Input
                       label="Nome:"
                       placeholder="Digite seu nome"
-                      action={handleChange('nome')}
+                      formikAction={handleChange('nome')}
+                      action={this.alteraNome}
                       value={values.nome}
                       tipoTeclado={"default"}
                     />
                     {errors.nome && touched.nome &&
-                      <Text style={{ fontSize: 10, color: 'red' }}>{errors.nome}</Text>
+                      <ErrorValidationMessage message={errors.nome} />
                     }
                     <Input
                       label="Idade:"
                       placeholder="Digite seu idade"
-                      action={handleChange('idade')}
+                      formikAction={handleChange('idade')}
+                      action={this.alteraIdade}
                       value={values.idade}
                       tipoTeclado={"numeric"}
                     />
                     {errors.idade && touched.idade &&
-                      <Text style={{ fontSize: 10, color: 'red' }}>{errors.idade}</Text>
+                      <ErrorValidationMessage message={errors.idade} />
+                    }
+                    <CustomPicker 
+                      label="Sexo:"
+                      valorSelecionado={this.state.sexo}
+                      listaItens={this.state.sexos}
+                      action={this.selecionaSexo}
+                      formikAction={setFieldValue}
+                      field='sexo'
+                    />
+                    {errors.sexo && touched.sexo &&
+                      <ErrorValidationMessage message={errors.sexo} />
                     }
                     <CustomPicker 
                       label="Curso:"
@@ -194,7 +231,7 @@ class App extends Component {
                       field='curso'
                     />
                     {errors.curso && touched.curso &&
-                      <Text style={{ fontSize: 10, color: 'red' }}>{errors.curso}</Text>
+                      <ErrorValidationMessage message={errors.curso} />
                     }
                     <CustomPicker 
                       label="Período:"
@@ -205,7 +242,7 @@ class App extends Component {
                       field='periodo'
                     />
                     {errors.periodo && touched.periodo &&
-                      <Text style={{ fontSize: 10, color: 'red' }}>{errors.periodo}</Text>
+                      <ErrorValidationMessage message={errors.periodo} />
                     }
                     <CustomPicker 
                       label="Turno:"
@@ -216,27 +253,35 @@ class App extends Component {
                       field='turno'
                     /> 
                     {errors.turno && touched.turno &&
-                      <Text style={{ fontSize: 10, color: 'red' }}>{errors.turno}</Text>
+                      <ErrorValidationMessage message={errors.turno} />
                     }
                     <CustomSlider 
                       titulo="Informe sua renda"
                       valorMin={0}
                       valorMax={10000}
                       action={this.alteraRenda}
+                      formikAction={setFieldValue}
+                      field='renda'
                       valorSlider={`R$ ${this.state.renda.toFixed(2)}`}
                     />
+                    {errors.renda && touched.renda &&
+                      <ErrorValidationMessage message={errors.renda} />
+                    }
                     <View style={styles.switchContainer}>
                           <Text> Já foi bolsista? </Text>
                           <View style={styles.switchContainer2}>
                               <Switch 
-                                  onValueChange={(valorSwitch) => this.setState({foiBolsista: valorSwitch})}
-                                  value={this.state.foiBolsista}
-                                  trackColor={{ false: "#dddfda", true: "#154c79" }}
-                                  thumbColor={this.state.foiBolsista ? "#ff5916" : "#dddfda"}
+                                onValueChange={(valorSwitch) => {this.setState({foiBolsista: valorSwitch}); setFieldValue('foiBolsista', valorSwitch)}}
+                                value={this.state.foiBolsista}
+                                trackColor={{ false: "#dddfda", true: "#154c79" }}
+                                thumbColor={this.state.foiBolsista ? "#ff5916" : "#dddfda"}
                               />
                               <Text>{this.state.foiBolsista ? 'Sim' : 'Não'}</Text>
                           </View>
                     </View>
+                    {errors.foiBolsista && touched.foiBolsista &&
+                      <ErrorValidationMessage message={errors.foiBolsista} />
+                    }
                     <BtnSubmit 
                       action={handleSubmit}
                       btnText={'Enviar solicitação'}

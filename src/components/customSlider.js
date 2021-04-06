@@ -15,7 +15,10 @@ class CustomSlider extends Component{
                         maximumTrackTintColor="#ff5916"
                         maximumValue={this.props.valorMax}
                         minimumValue={this.props.valorMin}
-                        onValueChange={(valorSelecionado) => this.props.action(valorSelecionado)}
+                        onValueChange={(itemValue) => {
+                            this.props.formikAction(this.props.field, itemValue)
+                            this.props.action(itemValue)
+                        }}
                     />
                     <Text style={styles.valor}> {this.props.valorSlider} </Text>
                 </View>
